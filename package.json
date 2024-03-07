@@ -2,12 +2,8 @@
   "name": "backend-server",
   "version": "1.0.0",
   "description": "",
-  "main": "api/index.js",
-  "engines": {
-    "node": ">=16.0.0"
-  },
   "scripts": {
-    "dev": "nodemon main.js"
+    "dev": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
