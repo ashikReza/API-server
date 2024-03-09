@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const customRouter = require("../router");
 const express = require("express");
 const jsonServer = require("../lib/jsonServer");
