@@ -55,6 +55,16 @@
       "bio": "",
       "password": "$2b$08$At/U5W1/ASt/F3zWCqOZnO75ftNVjwR.RVf0FEhEdQ0nHkll5tJ4m",
       "favourites": []
+    },
+    {
+      "id": "3c0f4ef603c68e1a4c82",
+      "email": "hi@gmail.com",
+      "firstName": "asr",
+      "lastName": "salahuddin",
+      "avatar": null,
+      "bio": "",
+      "password": "$2b$08$pK/AbZjTk/JLv.GojoSi5eOYn/dkzAC/3y2GkBXvZ/DFBcTvv3/Gi",
+      "favourites": []
     }
   ],
   "blogs": [
