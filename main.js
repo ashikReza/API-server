@@ -1,6 +1,6 @@
-const customRouter = require("../router");
+const customRouter = require("./router");
 const express = require("express");
-const jsonServer = require("../lib/jsonServer");
+const jsonServer = require("./lib/jsonServer");
 var cors = require("cors");
 
 require("dotenv").config();
