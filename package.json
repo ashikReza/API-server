@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ashikReza/E-Commerce-api"
+    "url": "https://github.com/ashikReza/API-server/tree/E-Commerce-api"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ashikReza/E-Commerce-api/issues"
+    "url": "https://github.com/ashikReza/API-server/tree/E-Commerce-api/issues"
   },
-  "homepage": "https://github.com/ashikReza/E-Commerce-api#readme",
+  "homepage": "https://github.com/ashikReza/API-server/tree/E-Commerce-api#readme",
   "devDependencies": {
     "nodemon": "^2.0.7"
   },
