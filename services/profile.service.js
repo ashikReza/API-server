@@ -19,7 +19,7 @@ const getUserById = (userId) => {
 
   const userObj = Object.assign({}, data);
   delete userObj.password;
-  
+
   return {
     ...userObj,
     blogs,
@@ -28,7 +28,7 @@ const getUserById = (userId) => {
 
 /**
  * Updates the user profile with the given userId and body.
- * @param {string} userId - The ID of the user.
+ * @param {object} user - The user object.
  * @param {object} body - The updated profile data.
  * @returns {object} - The updated user profile.
  * @throws {Error} - If the user is not found.
@@ -38,6 +38,15 @@ const updateUserProfile = (user, body) => {
 
   if (!data) {
     throw new Error("User not found");
+  }
+
+  // If the avatar is updated, also update it in all related blog posts
+  if (body.avatar) {
+    const userBlogs = Blog.filter((blog) => blog.author.id === user.id);
+    userBlogs.forEach((blog) => {
+      blog.author.avatar = body.avatar;
+      Blog.updateById(blog.id, blog);
+    });
   }
 
   const userObj = Object.assign({}, data);
