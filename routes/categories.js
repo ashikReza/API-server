@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express();
+const multer = require("multer");
 
 const Category = require("../models/category");
 
@@ -24,31 +25,43 @@ router.get("/:id", async (req, res) => {
   res.status(200).send(category);
 });
 
-router.post("/", async (req, res) => {
+// Multer configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/uploads/"); // Set the destination folder
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname); // Set the file name
+  },
+});
+const upload = multer({ storage: storage });
+
+router.post("/", upload.single("image"), async (req, res) => {
   try {
-    // Check if a category with the given name already exists
     const existingCategory = await Category.findOne({ name: req.body.name });
 
-    // If a category with the name already exists, send an error response
     if (existingCategory) {
       return res.status(400).send("Category name already in use");
     }
 
-    // If no category with the name exists, proceed with creating a new category
     const category = new Category({
       name: req.body.name,
       icon: req.body.icon,
       color: req.body.color,
+      image: req.file ? req.file.filename : null, // Use uploaded image filename if available
     });
 
-    // Save the new category to the database
     const savedCategory = await category.save();
 
     if (!savedCategory) {
       return res.status(500).send("Failed to create category");
     }
 
-    // Send the newly created category as a response
+    // Construct the image URL
+    savedCategory.image = `${req.protocol}://${req.get(
+      "host"
+    )}/public/uploads/${savedCategory.image}`;
+
     res.status(201).send(savedCategory);
   } catch (error) {
     console.error("Error creating category:", error);
@@ -56,31 +69,40 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
-  // Check if another category with the same name exists and has a different ID
-  const existingCategory = await Category.findOne({
-    name: req.body.name,
-    _id: { $ne: req.params.id },
-  });
-
-  // If another category with the name exists, send an error response
-  if (existingCategory) {
-    return res.status(400).send("Category name already in use");
-  }
-
-  // If no other category with the name exists, proceed with updating the category
-  const category = await Category.findByIdAndUpdate(
-    req.params.id,
-    {
+router.put("/:id", upload.single("image"), async (req, res) => {
+  try {
+    const existingCategory = await Category.findOne({
       name: req.body.name,
-      icon: req.body.icon,
-      color: req.body.color,
-    },
-    { new: true }
-  );
+      _id: { $ne: req.params.id },
+    });
 
-  if (!category) return res.status(404).send("Category cannot be updated");
-  res.send(category);
+    if (existingCategory) {
+      return res.status(400).send("Category name already in use");
+    }
+
+    const category = await Category.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: req.body.name,
+        icon: req.body.icon,
+        color: req.body.color,
+        image: req.file ? req.file.filename : req.body.image, // Update image if uploaded, else use existing image
+      },
+      { new: true }
+    );
+
+    if (!category) return res.status(404).send("Category cannot be updated");
+
+    // Construct the image URL
+    category.image = `${req.protocol}://${req.get("host")}/public/uploads/${
+      category.image
+    }`;
+
+    res.send(category);
+  } catch (error) {
+    console.error("Error updating category:", error);
+    res.status(500).send("Internal server error");
+  }
 });
 
 router.delete("/:id", (req, res) => {
