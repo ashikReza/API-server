@@ -5,24 +5,58 @@ const multer = require("multer");
 const Category = require("../models/category");
 
 router.get("/", async (req, res) => {
-  const categoryList = await Category.find();
+  try {
+    const categoryList = await Category.find();
 
-  if (!categoryList) {
-    res.status(500).json({ success: false });
+    if (!categoryList) {
+      return res.status(500).json({ success: false });
+    }
+
+    // Modify the image URLs to include the base path
+    const categoriesWithBasePath = categoryList.map((category) => {
+      return {
+        ...category._doc,
+        image: category.image
+          ? `${req.protocol}://${req.get("host")}/public/uploads/${
+              category.image
+            }`
+          : null,
+      };
+    });
+
+    res.status(200).json(categoriesWithBasePath);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
-  res.status(200).send(categoryList);
 });
 
 router.get("/:id", async (req, res) => {
-  const category = await Category.findById(req.params.id);
+  try {
+    const category = await Category.findById(req.params.id);
 
-  if (!category) {
-    res.status(500).json({
-      success: false,
-      message: "The category with the given ID not exists",
-    });
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "The category with the given ID does not exist",
+      });
+    }
+
+    // Modify the image URL to include the base path
+    const categoryWithBasePath = {
+      ...category._doc,
+      image: category.image
+        ? `${req.protocol}://${req.get("host")}/public/uploads/${
+            category.image
+          }`
+        : null,
+    };
+
+    res.status(200).json(categoryWithBasePath);
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
-  res.status(200).send(category);
 });
 
 // Multer configuration
