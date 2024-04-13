@@ -27,33 +27,52 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  // Check if a user with the given email already exists
-  const existingUser = await User.findOne({ email: req.body.email });
+  try {
+    // Check if a user with the given email already exists
+    const existingUser = await User.findOne({ email: req.body.email });
 
-  // If a user with the email already exists, send an error response
-  if (existingUser) {
-    return res.status(400).send("Email already in use");
+    // If a user with the email already exists, send an error response
+    if (existingUser) {
+      return res.status(400).send("Email already in use");
+    }
+
+    // If no user with the email exists, proceed with registration
+    let user = new User({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      passwordHash: bcrypt.hashSync(req.body.password, 10),
+      phone: req.body.phone,
+      isAdmin: req.body.isAdmin,
+      street: req.body.street,
+      apartment: req.body.apartment,
+      zip: req.body.zip,
+      city: req.body.city,
+      country: req.body.country,
+    });
+
+    user = await user.save();
+
+    if (!user) return res.status(404).send("User cannot be created");
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        userID: user.id,
+        isAdmin: user.isAdmin,
+      },
+      process.env.secret,
+      { expiresIn: "1d" }
+    );
+
+    // Return user details and token
+    res.status(201).send({
+      user: user,
+      token: token
+    });
+  } catch (error) {
+    res.status(500).send(error.message);
   }
-
-  // If no user with the email exists, proceed with registration
-  let user = new User({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    passwordHash: bcrypt.hashSync(req.body.password, 10),
-    phone: req.body.phone,
-    isAdmin: req.body.isAdmin,
-    street: req.body.street,
-    apartment: req.body.apartment,
-    zip: req.body.zip,
-    city: req.body.city,
-    country: req.body.country,
-  });
-
-  user = await user.save();
-
-  if (!user) return res.status(404).send("User cannot be created");
-  res.send(user);
 });
 
 router.delete("/:id", (req, res) => {
