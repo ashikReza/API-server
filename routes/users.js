@@ -54,7 +54,7 @@ router.post("/register", async (req, res) => {
     user = await user.save();
 
     if (!user) return res.status(404).send("User cannot be created");
-    
+
     // Generate JWT token
     const token = jwt.sign(
       {
@@ -68,7 +68,7 @@ router.post("/register", async (req, res) => {
     // Return user details and token
     res.status(201).send({
       user: user,
-      token: token
+      token: token,
     });
   } catch (error) {
     res.status(500).send(error.message);
@@ -111,8 +111,16 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
     return res.status(200).send({
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
+      phone: user.phone,
+      isAdmin: user.isAdmin,
+      street: user.street,
+      apartment: user.apartment,
+      zip: user.zip,
+      city: user.city,
+      country: user.country,
       token: token,
     });
   } else {
